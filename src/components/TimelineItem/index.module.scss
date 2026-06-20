@@ -1,0 +1,118 @@
+@use '@/styles/variables.scss' as *;
+
+.timelineItem {
+  display: flex;
+  min-height: 120rpx;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40rpx;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+}
+
+.dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: $radius-round;
+  margin-top: 10rpx;
+  flex-shrink: 0;
+}
+
+.dotSubmit {
+  background-color: $color-primary;
+}
+
+.dotView {
+  background-color: $color-text-tertiary;
+}
+
+.dotAgree {
+  background-color: $color-status-completed;
+}
+
+.dotReturn {
+  background-color: $color-status-returned;
+}
+
+.dotForward {
+  background-color: $color-status-waiting;
+}
+
+.line {
+  width: 4rpx;
+  flex: 1;
+  background-color: $color-border;
+  margin: 8rpx 0;
+}
+
+.right {
+  flex: 1;
+  padding-bottom: $spacing-lg;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4rpx;
+}
+
+.actor {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.action {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  margin-right: $spacing-sm;
+}
+
+.actionSubmit {
+  color: $color-primary;
+}
+
+.actionView {
+  color: $color-text-tertiary;
+}
+
+.actionAgree {
+  color: $color-status-completed;
+}
+
+.actionReturn {
+  color: $color-status-returned;
+}
+
+.actionForward {
+  color: $color-status-waiting;
+}
+
+.role {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background-color: $color-bg-hover;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 8rpx;
+}
+
+.opinion {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  background-color: $color-bg-hover;
+  padding: $spacing-sm;
+  border-radius: $radius-sm;
+  margin-top: 8rpx;
+}

@@ -1,0 +1,106 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.95;
+    transform: scale(0.99);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+  flex: 1;
+  margin-right: $spacing-sm;
+  @include text-ellipsis-multi(2);
+}
+
+.cardBody {
+  margin-bottom: $spacing-md;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.label {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.value {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex: 1;
+  @include text-ellipsis;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.roleTag {
+  display: inline-flex;
+  align-items: center;
+  background-color: $color-tag-bg-processing;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+}
+
+.roleText {
+  font-size: $font-size-xs;
+  color: $color-status-processing;
+  font-weight: $font-weight-medium;
+}
+
+.timeInfo {
+  display: flex;
+  align-items: center;
+}
+
+.timeText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.normal {
+  .timeText {
+    color: $color-text-tertiary;
+  }
+}
+
+.warning {
+  .timeText {
+    color: $color-status-waiting;
+  }
+}
+
+.urgent {
+  .timeText {
+    color: $color-status-returned;
+  }
+}
