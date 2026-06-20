@@ -44,6 +44,12 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
         </View>
         <Text className={styles.time}>{formatFullTime(node.timestamp)}</Text>
         {node.opinion ? <Text className={styles.opinion}>{node.opinion}</Text> : null}
+        {node.costRequirement ? (
+          <View className={styles.costBlock}>
+            <Text className={styles.costLabel}>费用控制要求</Text>
+            <Text className={styles.costText}>{node.costRequirement}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );

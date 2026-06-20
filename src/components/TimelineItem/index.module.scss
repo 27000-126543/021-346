@@ -116,3 +116,25 @@
   border-radius: $radius-sm;
   margin-top: 8rpx;
 }
+
+.costBlock {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: #fff8e6;
+  border-left: 6rpx solid #d69e2e;
+  border-radius: $radius-sm;
+}
+
+.costLabel {
+  font-size: $font-size-xs;
+  color: #b7791f;
+  font-weight: $font-weight-semibold;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.costText {
+  font-size: $font-size-sm;
+  color: #744210;
+  line-height: $line-height-normal;
+}

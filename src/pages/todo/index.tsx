@@ -4,7 +4,8 @@ import classnames from 'classnames';
 import Taro from '@tarojs/taro';
 import { useNegotiationStore } from '@/store/useNegotiationStore';
 import NegotiationCard from '@/components/NegotiationCard';
-import type { NodeStatus } from '@/types/negotiation';
+import type { NodeStatus, UserRole } from '@/types/negotiation';
+import { ROLE_LABELS } from '@/types/negotiation';
 import styles from './index.module.scss';
 
 const FILTER_OPTIONS: { label: string; value: NodeStatus | 'all' }[] = [
@@ -14,9 +15,17 @@ const FILTER_OPTIONS: { label: string; value: NodeStatus | 'all' }[] = [
   { label: '已退回', value: 'returned' },
 ];
 
+const ROLE_OPTIONS: { label: string; value: UserRole }[] = [
+  { label: '建设单位', value: 'owner' },
+  { label: '监理工程师', value: 'supervisor' },
+  { label: '总包', value: 'general_contractor' },
+  { label: '分包', value: 'subcontractor' },
+];
+
 const TodoPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<NodeStatus | 'all'>('all');
-  const { user, getTodoList, getRecordList } = useNegotiationStore();
+  const [showRolePicker, setShowRolePicker] = useState(false);
+  const { user, getTodoList, getRecordList, switchRole } = useNegotiationStore();
 
   const todoList = useMemo(() => getTodoList(), [getTodoList]);
   const recordList = useMemo(() => getRecordList(), [getRecordList]);
@@ -35,14 +44,55 @@ const TodoPage: React.FC = () => {
     Taro.navigateTo({ url: `/pages/detail/index?id=${id}` });
   };
 
+  const handleRoleSwitch = (role: UserRole) => {
+    switchRole(role);
+    setShowRolePicker(false);
+    Taro.showToast({
+      title: `已切换为${ROLE_LABELS[role]}`,
+      icon: 'none',
+    });
+  };
+
   return (
     <ScrollView className={styles.container} scrollY>
-      <View className={styles.header}>
-        <Text className={styles.greeting}>{user.roleLabel}，你好</Text>
-        <Text className={styles.subtitle}>
-          当前有 {todoList.length} 条待处理，{recordList.length} 条已处理
-        </Text>
+      <View className={styles.topBar}>
+        <View className={styles.userInfo}>
+          <View className={styles.avatar}>
+            <Text className={styles.avatarText}>{user.name.charAt(0)}</Text>
+          </View>
+          <View className={styles.userText}>
+            <Text className={styles.greeting}>{user.roleLabel}，你好</Text>
+            <Text className={styles.subtitle}>{user.company}</Text>
+          </View>
+        </View>
+        <View className={styles.roleSwitchBtn} onClick={() => setShowRolePicker(!showRolePicker)}>
+          <Text className={styles.roleSwitchText}>切换角色</Text>
+        </View>
       </View>
+
+      {showRolePicker && (
+        <View className={styles.rolePicker}>
+          {ROLE_OPTIONS.map((opt) => (
+            <View
+              key={opt.value}
+              className={classnames(
+                styles.roleOption,
+                user.role === opt.value && styles.roleOptionActive
+              )}
+              onClick={() => handleRoleSwitch(opt.value)}
+            >
+              <Text
+                className={classnames(
+                  styles.roleOptionText,
+                  user.role === opt.value && styles.roleOptionTextActive
+                )}
+              >
+                {opt.label}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       <View className={styles.statsBar}>
         <View className={styles.statCard}>

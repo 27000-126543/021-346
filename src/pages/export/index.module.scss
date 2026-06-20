@@ -1,0 +1,271 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding-bottom: 160rpx;
+}
+
+.paper {
+  background-color: #ffffff;
+  margin: $spacing-lg $page-padding;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  box-shadow: $shadow-card;
+}
+
+.docHeader {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+  padding-bottom: $spacing-lg;
+  border-bottom: 2rpx solid $color-border;
+}
+
+.docTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.docNo {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: block;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  padding-left: $spacing-sm;
+  border-left: 6rpx solid $color-primary;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+}
+
+.infoLabel {
+  color: $color-text-tertiary;
+  width: 180rpx;
+  flex-shrink: 0;
+}
+
+.infoValue {
+  color: $color-text-primary;
+  flex: 1;
+  font-weight: $font-weight-medium;
+}
+
+.signTable {
+  width: 100%;
+  border: 1rpx solid $color-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.signHeader {
+  display: flex;
+  background-color: $color-tag-bg-processing;
+}
+
+.signRow {
+  display: flex;
+  border-top: 1rpx solid $color-border;
+  min-height: 120rpx;
+  align-items: center;
+}
+
+.signCell {
+  padding: $spacing-sm;
+  font-size: $font-size-sm;
+  line-height: $line-height-tight;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.signHeaderCell {
+  padding: $spacing-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  flex: 1;
+}
+
+.colRole {
+  width: 180rpx;
+  flex: 0 0 180rpx;
+}
+
+.colPerson {
+  width: 140rpx;
+  flex: 0 0 140rpx;
+}
+
+.colTime {
+  width: 220rpx;
+  flex: 0 0 220rpx;
+}
+
+.colOpinion {
+  flex: 1;
+}
+
+.cellValue {
+  color: $color-text-primary;
+}
+
+.cellTime {
+  color: $color-text-tertiary;
+  font-size: $font-size-xs;
+}
+
+.cellEmpty {
+  color: $color-text-disabled;
+}
+
+.costNote {
+  background-color: #fff8e6;
+  border-left: 6rpx solid #d69e2e;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  margin-top: $spacing-sm;
+}
+
+.costLabel {
+  font-size: $font-size-xs;
+  color: #b7791f;
+  font-weight: $font-weight-semibold;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.costContent {
+  font-size: $font-size-sm;
+  color: #744210;
+  line-height: $line-height-normal;
+}
+
+.attachList {
+  border: 1rpx solid $color-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.attachRow {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.attachIcon {
+  font-size: $font-size-lg;
+  margin-right: $spacing-sm;
+}
+
+.attachName {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.attachSize {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+}
+
+.footerBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.btnSecondary {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  background-color: #ffffff;
+  border: 2rpx solid $color-primary;
+  border-radius: $radius-button;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.btnSecondaryText {
+  color: $color-primary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.btnPrimary {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  border: none;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.btnPrimaryText {
+  color: #ffffff;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

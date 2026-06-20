@@ -26,11 +26,9 @@ const RecordsPage: React.FC = () => {
   };
 
   const handleExport = () => {
-    Taro.showToast({
-      title: '会签包生成中...',
-      icon: 'loading',
-      duration: 2000,
-    });
+    if (filteredList.length === 0) return;
+    const ids = encodeURIComponent(JSON.stringify(filteredList.map((n) => n.id)));
+    Taro.navigateTo({ url: `/pages/export/index?ids=${ids}` });
     console.info('[Export] 开始生成会签包', { count: filteredList.length });
   };
 

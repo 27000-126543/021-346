@@ -7,22 +7,116 @@
   padding-bottom: 120rpx;
 }
 
-.header {
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: $spacing-lg 0 $spacing-md;
 }
 
-.greeting {
-  font-size: $font-size-xxl;
+.userInfo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.avatarText {
+  font-size: $font-size-lg;
+  color: $color-text-white;
   font-weight: $font-weight-bold;
+}
+
+.userText {
+  flex: 1;
+  min-width: 0;
+}
+
+.greeting {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
   color: $color-text-primary;
   display: block;
-  margin-bottom: $spacing-xs;
+  @include text-ellipsis;
 }
 
 .subtitle {
-  font-size: $font-size-md;
+  font-size: $font-size-sm;
   color: $color-text-secondary;
   display: block;
+  margin-top: 4rpx;
+  @include text-ellipsis;
+}
+
+.roleSwitchBtn {
+  @include button-reset;
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-round;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1rpx solid $color-border;
+  margin-left: $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.roleSwitchText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.rolePicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.roleOption {
+  @include button-reset;
+  height: 64rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.roleOptionActive {
+  background-color: $color-primary;
+  border-color: $color-primary;
+}
+
+.roleOptionText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.roleOptionTextActive {
+  color: $color-text-white;
 }
 
 .statsBar {

@@ -2,8 +2,8 @@ export default defineAppConfig({
   pages: [
     'pages/todo/index',
     'pages/records/index',
-    'pages/mine/index',
-    'pages/detail/index'
+    'pages/detail/index',
+    'pages/export/index'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -24,10 +24,6 @@ export default defineAppConfig({
       {
         pagePath: 'pages/records/index',
         text: '记录'
-      },
-      {
-        pagePath: 'pages/mine/index',
-        text: '我的'
       }
     ]
   }

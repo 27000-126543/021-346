@@ -12,7 +12,7 @@ import styles from './index.module.scss';
 
 const DetailPage: React.FC = () => {
   const [id, setId] = useState('');
-  const { user, getNegotiationById, getTimelineById, signNegotiation } = useNegotiationStore();
+  const { user, getNegotiationById, getTimelineById, signNegotiation, addViewRecord } = useNegotiationStore();
 
   React.useEffect(() => {
     const instance = Taro.getCurrentInstance();
@@ -21,6 +21,12 @@ const DetailPage: React.FC = () => {
       setId(params.id);
     }
   }, []);
+
+  React.useEffect(() => {
+    if (id) {
+      addViewRecord(id);
+    }
+  }, [id, addViewRecord]);
 
   const item = useMemo(() => {
     if (!id) return null;
@@ -45,17 +51,17 @@ const DetailPage: React.FC = () => {
       icon: 'success',
       duration: 1500,
     });
-    console.info('[Detail] sign negotiation', { id, action, opinion });
+    console.info('[Detail] sign negotiation', { id, action, opinion, costRequirement });
   };
 
   const handleExportSingle = () => {
-    Taro.showToast({ title: '正在生成...', icon: 'loading', duration: 2000 });
-    console.info('[Detail] export single', { id });
+    if (!id) return;
+    Taro.navigateTo({ url: `/pages/export/index?id=${id}` });
   };
 
   const handleExportFull = () => {
-    Taro.showToast({ title: '正在生成完整会签包...', icon: 'loading', duration: 2000 });
-    console.info('[Detail] export full package', { id });
+    if (!id) return;
+    Taro.navigateTo({ url: `/pages/export/index?id=${id}` });
   };
 
   if (!item) {

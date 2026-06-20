@@ -37,6 +37,7 @@ export interface TimelineNode {
   opinion: string;
   timestamp: string;
   signAction?: SignAction;
+  costRequirement?: string;
 }
 
 export interface SignOpinion {
