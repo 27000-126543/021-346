@@ -269,3 +269,116 @@
   font-size: $font-size-md;
   color: $color-text-tertiary;
 }
+
+.cover {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  margin: $spacing-lg $page-padding;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  color: #ffffff;
+  box-shadow: $shadow-card;
+}
+
+.coverTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: #ffffff;
+  display: block;
+  text-align: center;
+  margin-bottom: $spacing-md;
+}
+
+.coverMeta {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.coverMetaItem {
+  text-align: center;
+}
+
+.coverMetaNum {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: #ffffff;
+  display: block;
+}
+
+.coverMetaLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+  margin-top: 4rpx;
+}
+
+.flowBar {
+  display: flex;
+  align-items: center;
+  background-color: $color-tag-bg-processing;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-top: $spacing-md;
+}
+
+.flowNode {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.flowNodeIcon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.flowNodeIconDone {
+  background-color: $color-status-completed;
+}
+
+.flowNodeIconCurrent {
+  background-color: $color-primary;
+}
+
+.flowNodeIconPending {
+  background-color: #ffffff;
+  border: 2rpx solid $color-border;
+}
+
+.flowNodeText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  flex: 1;
+  @include text-ellipsis;
+  color: $color-text-secondary;
+}
+
+.flowNodeTextActive {
+  color: $color-text-primary;
+}
+
+.flowNodeIconText {
+  color: #ffffff;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.flowNodeIconTextPending {
+  color: $color-text-tertiary;
+}
+
+.flowArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  margin: 0 $spacing-xs;
+}
+

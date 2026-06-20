@@ -4,6 +4,28 @@ export type NodeStatus = 'waiting' | 'processing' | 'completed' | 'returned';
 
 export type SignAction = 'agree' | 'return_supplement' | 'need_design_confirm';
 
+export type TimelineAction =
+  | 'viewed'
+  | 'returned'
+  | 'agreed'
+  | 'submitted'
+  | 'forwarded'
+  | 'exported';
+
+export const FLOW_ORDER: UserRole[] = [
+  'subcontractor',
+  'general_contractor',
+  'supervisor',
+  'owner',
+];
+
+export const NODE_NAME_MAP: Record<UserRole, string> = {
+  subcontractor: '分包审核',
+  general_contractor: '总包审核',
+  supervisor: '监理审核',
+  owner: '建设单位审核',
+};
+
 export interface NegotiationItem {
   id: string;
   title: string;
@@ -33,11 +55,12 @@ export interface TimelineNode {
   negotiationId: string;
   role: UserRole;
   actorName: string;
-  action: 'viewed' | 'returned' | 'agreed' | 'submitted' | 'forwarded';
+  action: TimelineAction;
   opinion: string;
   timestamp: string;
   signAction?: SignAction;
   costRequirement?: string;
+  exportType?: 'single' | 'batch' | 'share' | 'print';
 }
 
 export interface SignOpinion {
@@ -84,4 +107,5 @@ export const TIMELINE_ACTION_LABELS: Record<string, string> = {
   agreed: '同意',
   submitted: '提交',
   forwarded: '转交',
+  exported: '导出会签包',
 };

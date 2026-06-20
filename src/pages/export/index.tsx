@@ -1,18 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text } from '@tarojs/components';
+import classnames from 'classnames';
 import Taro from '@tarojs/taro';
 import { useNegotiationStore } from '@/store/useNegotiationStore';
-import { ROLE_LABELS, SIGN_ACTION_LABELS } from '@/types/negotiation';
+import {
+  ROLE_LABELS,
+  SIGN_ACTION_LABELS,
+  FLOW_ORDER,
+} from '@/types/negotiation';
 import type { UserRole, TimelineNode, SignAction } from '@/types/negotiation';
 import { formatFullTime } from '@/utils/timeUtils';
 import styles from './index.module.scss';
 
-const SIGN_ORDER: UserRole[] = ['subcontractor', 'general_contractor', 'supervisor', 'owner'];
+const SIGN_ROLES: UserRole[] = FLOW_ORDER;
 
 const ExportPage: React.FC = () => {
   const [id, setId] = useState('');
   const [ids, setIds] = useState<string[]>([]);
-  const { getNegotiationById, getTimelineById } = useNegotiationStore();
+  const negotiations = useNegotiationStore((s) => s.negotiations);
+  const timelines = useNegotiationStore((s) => s.timelines);
+  const addExportRecord = useNegotiationStore((s) => s.addExportRecord);
 
   React.useEffect(() => {
     const instance = Taro.getCurrentInstance();
@@ -40,6 +47,20 @@ const ExportPage: React.FC = () => {
     return list.filter((v, i, arr) => arr.indexOf(v) === i);
   }, [id, ids]);
 
+  const isBatch = exportItems.length > 1;
+
+  const completedCount = useMemo(() => {
+    return negotiations.filter(
+      (n) => exportItems.includes(n.id) && n.status === 'completed'
+    ).length;
+  }, [negotiations, exportItems]);
+
+  const returnedCount = useMemo(() => {
+    return negotiations.filter(
+      (n) => exportItems.includes(n.id) && n.status === 'returned'
+    ).length;
+  }, [negotiations, exportItems]);
+
   const signRecordsByRole = (timeline: TimelineNode[]) => {
     const result: Record<UserRole, TimelineNode | null> = {
       subcontractor: null,
@@ -56,13 +77,26 @@ const ExportPage: React.FC = () => {
     return result;
   };
 
+  const getFlowStatus = (item: { currentNodeRole: UserRole; status: string }, role: UserRole) => {
+    const currentIdx = SIGN_ROLES.indexOf(item.currentNodeRole);
+    const roleIdx = SIGN_ROLES.indexOf(role);
+    if (item.status === 'completed') return 'done';
+    if (roleIdx < currentIdx) return 'done';
+    if (roleIdx === currentIdx) return 'current';
+    return 'pending';
+  };
+
   const handleShare = () => {
-    Taro.showToast({ title: '分享会签包', icon: 'none' });
+    if (exportItems.length === 0) return;
+    addExportRecord(exportItems, 'share');
+    Taro.showToast({ title: '已生成分享链接', icon: 'success' });
     console.info('[Export] share', { count: exportItems.length });
   };
 
   const handlePrint = () => {
-    Taro.showToast({ title: '发送至打印', icon: 'loading', duration: 1500 });
+    if (exportItems.length === 0) return;
+    addExportRecord(exportItems, 'print');
+    Taro.showToast({ title: '已发送至打印', icon: 'success' });
     console.info('[Export] print', { count: exportItems.length });
   };
 
@@ -79,27 +113,100 @@ const ExportPage: React.FC = () => {
 
   return (
     <View className={styles.container}>
+      <View className={styles.cover}>
+        <Text className={styles.coverTitle}>
+          {isBatch ? '批量洽商会签清单' : '变更洽商会签单'}
+        </Text>
+        <View className={styles.coverMeta}>
+          <View className={styles.coverMetaItem}>
+            <Text className={styles.coverMetaNum}>{exportItems.length}</Text>
+            <Text className={styles.coverMetaLabel}>洽商总数</Text>
+          </View>
+          <View className={styles.coverMetaItem}>
+            <Text className={styles.coverMetaNum}>{completedCount}</Text>
+            <Text className={styles.coverMetaLabel}>已完成</Text>
+          </View>
+          <View className={styles.coverMetaItem}>
+            <Text className={styles.coverMetaNum}>{returnedCount}</Text>
+            <Text className={styles.coverMetaLabel}>已退回</Text>
+          </View>
+          <View className={styles.coverMetaItem}>
+            <Text className={styles.coverMetaNum}>
+              {new Date().toISOString().slice(0, 10)}
+            </Text>
+            <Text className={styles.coverMetaLabel}>导出日期</Text>
+          </View>
+        </View>
+      </View>
+
       {exportItems.map((nid, idx) => {
-        const item = getNegotiationById(nid);
-        const timeline = getTimelineById(nid);
+        const item = negotiations.find((n) => n.id === nid);
+        const timeline = timelines[nid] || [];
         if (!item) return null;
         const signs = signRecordsByRole(timeline);
         return (
           <View key={nid} className={styles.paper}>
             <View className={styles.docHeader}>
-              <Text className={styles.docTitle}>变更洽商会签单</Text>
-              <Text className={styles.docNo}>
-                编号：{item.id.toUpperCase()} · {item.createdAt.slice(0, 10)}
+              <Text className={styles.docTitle}>
+                {idx + 1}. {item.title}
               </Text>
+              <Text className={styles.docNo}>
+                编号：{item.id.toUpperCase()} · 提交时间 {item.createdAt}
+              </Text>
+            </View>
+
+            <View className={styles.section}>
+              <Text className={styles.sectionTitle}>节点流转顺序</Text>
+              <View className={styles.flowBar}>
+                {SIGN_ROLES.map((role, rIdx) => {
+                  const status = getFlowStatus(item, role);
+                  const iconClassMap = {
+                    done: styles.flowNodeIconDone,
+                    current: styles.flowNodeIconCurrent,
+                    pending: styles.flowNodeIconPending,
+                  };
+                  const textClassMap = {
+                    done: styles.flowNodeTextActive,
+                    current: styles.flowNodeTextActive,
+                    pending: '',
+                  };
+                  const iconTextMap: Record<string, string> = {
+                    done: '✓',
+                    current: String(rIdx + 1),
+                    pending: String(rIdx + 1),
+                  };
+                  return (
+                    <React.Fragment key={role}>
+                      <View className={styles.flowNode}>
+                        <View
+                          className={classnames(styles.flowNodeIcon, iconClassMap[status])}
+                        >
+                          <Text
+                            className={classnames(
+                              status === 'pending'
+                                ? styles.flowNodeIconTextPending
+                                : styles.flowNodeIconText
+                            )}
+                          >
+                            {iconTextMap[status]}
+                          </Text>
+                        </View>
+                        <Text className={classnames(styles.flowNodeText, textClassMap[status])}>
+                          {ROLE_LABELS[role]}
+                        </Text>
+                      </View>
+                      {rIdx < SIGN_ROLES.length - 1 && (
+                        <Text className={styles.flowArrow}>›</Text>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </View>
             </View>
 
             <View className={styles.section}>
               <Text className={styles.sectionTitle}>洽商基本信息</Text>
               <View className={styles.infoGrid}>
-                <View className={styles.infoRow}>
-                  <Text className={styles.infoLabel}>洽商主题</Text>
-                  <Text className={styles.infoValue}>{item.title}</Text>
-                </View>
                 <View className={styles.infoRow}>
                   <Text className={styles.infoLabel}>发起单位</Text>
                   <Text className={styles.infoValue}>{item.initiator}</Text>
@@ -129,10 +236,6 @@ const ExportPage: React.FC = () => {
                   </Text>
                 </View>
                 <View className={styles.infoRow}>
-                  <Text className={styles.infoLabel}>提交时间</Text>
-                  <Text className={styles.infoValue}>{item.createdAt}</Text>
-                </View>
-                <View className={styles.infoRow}>
                   <Text className={styles.infoLabel}>更新时间</Text>
                   <Text className={styles.infoValue}>{item.updatedAt}</Text>
                 </View>
@@ -148,7 +251,7 @@ const ExportPage: React.FC = () => {
                   <View className={`${styles.signHeaderCell} ${styles.colTime}`}>时间</View>
                   <View className={`${styles.signHeaderCell} ${styles.colOpinion}`}>意见</View>
                 </View>
-                {SIGN_ORDER.map((role) => {
+                {SIGN_ROLES.map((role) => {
                   const sign = signs[role];
                   return (
                     <View key={role} className={styles.signRow}>

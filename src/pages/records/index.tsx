@@ -3,6 +3,7 @@ import { View, Text, ScrollView } from '@tarojs/components';
 import classnames from 'classnames';
 import Taro from '@tarojs/taro';
 import { useNegotiationStore } from '@/store/useNegotiationStore';
+import { selectRecordList } from '@/store/useNegotiationStore';
 import NegotiationCard from '@/components/NegotiationCard';
 import styles from './index.module.scss';
 
@@ -13,9 +14,8 @@ const TAB_OPTIONS = [
 
 const RecordsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'completed' | 'returned'>('completed');
-  const { getRecordList } = useNegotiationStore();
-
-  const recordList = useMemo(() => getRecordList(), [getRecordList]);
+  const recordList = useNegotiationStore(selectRecordList);
+  const addExportRecord = useNegotiationStore((s) => s.addExportRecord);
 
   const filteredList = useMemo(() => {
     return recordList.filter((n) => n.status === activeTab);
@@ -27,8 +27,10 @@ const RecordsPage: React.FC = () => {
 
   const handleExport = () => {
     if (filteredList.length === 0) return;
-    const ids = encodeURIComponent(JSON.stringify(filteredList.map((n) => n.id)));
-    Taro.navigateTo({ url: `/pages/export/index?ids=${ids}` });
+    const ids = filteredList.map((n) => n.id);
+    addExportRecord(ids, 'batch');
+    const idsParam = encodeURIComponent(JSON.stringify(ids));
+    Taro.navigateTo({ url: `/pages/export/index?ids=${idsParam}` });
     console.info('[Export] 开始生成会签包', { count: filteredList.length });
   };
 

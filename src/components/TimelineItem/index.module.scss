@@ -42,6 +42,10 @@
   background-color: $color-status-waiting;
 }
 
+.dotExport {
+  background-color: #553c9a;
+}
+
 .line {
   width: 4rpx;
   flex: 1;
@@ -91,6 +95,10 @@
 
 .actionForward {
   color: $color-status-waiting;
+}
+
+.actionExport {
+  color: #553c9a;
 }
 
 .role {

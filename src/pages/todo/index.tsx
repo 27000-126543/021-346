@@ -3,6 +3,7 @@ import { View, Text, ScrollView } from '@tarojs/components';
 import classnames from 'classnames';
 import Taro from '@tarojs/taro';
 import { useNegotiationStore } from '@/store/useNegotiationStore';
+import { selectTodoList, selectRecordList } from '@/store/useNegotiationStore';
 import NegotiationCard from '@/components/NegotiationCard';
 import type { NodeStatus, UserRole } from '@/types/negotiation';
 import { ROLE_LABELS } from '@/types/negotiation';
@@ -25,10 +26,10 @@ const ROLE_OPTIONS: { label: string; value: UserRole }[] = [
 const TodoPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<NodeStatus | 'all'>('all');
   const [showRolePicker, setShowRolePicker] = useState(false);
-  const { user, getTodoList, getRecordList, switchRole } = useNegotiationStore();
-
-  const todoList = useMemo(() => getTodoList(), [getTodoList]);
-  const recordList = useMemo(() => getRecordList(), [getRecordList]);
+  const user = useNegotiationStore((s) => s.user);
+  const switchRole = useNegotiationStore((s) => s.switchRole);
+  const todoList = useNegotiationStore(selectTodoList);
+  const recordList = useNegotiationStore(selectRecordList);
 
   const urgentCount = useMemo(
     () => todoList.filter((n) => n.remainingHours > 0 && n.remainingHours <= 24).length,

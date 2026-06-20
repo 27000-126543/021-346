@@ -11,6 +11,13 @@ interface TimelineItemProps {
   isLast: boolean;
 }
 
+const EXPORT_TYPE_LABEL: Record<string, string> = {
+  single: '单条导出',
+  batch: '批量导出',
+  share: '分享',
+  print: '发送打印',
+};
+
 const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
   const actionColorMap: Record<string, string> = {
     submitted: styles.actionSubmit,
@@ -18,6 +25,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
     agreed: styles.actionAgree,
     returned: styles.actionReturn,
     forwarded: styles.actionForward,
+    exported: styles.actionExport,
   };
 
   const dotColorMap: Record<string, string> = {
@@ -26,7 +34,11 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
     agreed: styles.dotAgree,
     returned: styles.dotReturn,
     forwarded: styles.dotForward,
+    exported: styles.dotExport,
   };
+
+  const actionLabel = TIMELINE_ACTION_LABELS[node.action] || node.action;
+  const exportExtra = node.action === 'exported' && node.exportType ? `(${EXPORT_TYPE_LABEL[node.exportType] || node.exportType})` : '';
 
   return (
     <View className={styles.timelineItem}>
@@ -38,7 +50,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
         <View className={styles.header}>
           <Text className={styles.actor}>{node.actorName}</Text>
           <Text className={classnames(styles.action, actionColorMap[node.action])}>
-            {TIMELINE_ACTION_LABELS[node.action] || node.action}
+            {actionLabel}{exportExtra}
           </Text>
           <Text className={styles.role}>{ROLE_LABELS[node.role]}</Text>
         </View>

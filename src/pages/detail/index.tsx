@@ -12,7 +12,12 @@ import styles from './index.module.scss';
 
 const DetailPage: React.FC = () => {
   const [id, setId] = useState('');
-  const { user, getNegotiationById, getTimelineById, signNegotiation, addViewRecord } = useNegotiationStore();
+  const user = useNegotiationStore((s) => s.user);
+  const negotiations = useNegotiationStore((s) => s.negotiations);
+  const timelines = useNegotiationStore((s) => s.timelines);
+  const signNegotiation = useNegotiationStore((s) => s.signNegotiation);
+  const addViewRecord = useNegotiationStore((s) => s.addViewRecord);
+  const addExportRecord = useNegotiationStore((s) => s.addExportRecord);
 
   React.useEffect(() => {
     const instance = Taro.getCurrentInstance();
@@ -30,13 +35,13 @@ const DetailPage: React.FC = () => {
 
   const item = useMemo(() => {
     if (!id) return null;
-    return getNegotiationById(id) || null;
-  }, [id, getNegotiationById]);
+    return negotiations.find((n) => n.id === id) || null;
+  }, [id, negotiations]);
 
   const timeline = useMemo(() => {
     if (!id) return [];
-    return getTimelineById(id);
-  }, [id, getTimelineById]);
+    return timelines[id] || [];
+  }, [id, timelines]);
 
   const canSign = useMemo(() => {
     if (!item) return false;
@@ -56,11 +61,13 @@ const DetailPage: React.FC = () => {
 
   const handleExportSingle = () => {
     if (!id) return;
+    addExportRecord([id], 'single');
     Taro.navigateTo({ url: `/pages/export/index?id=${id}` });
   };
 
   const handleExportFull = () => {
     if (!id) return;
+    addExportRecord([id], 'single');
     Taro.navigateTo({ url: `/pages/export/index?id=${id}` });
   };
 
