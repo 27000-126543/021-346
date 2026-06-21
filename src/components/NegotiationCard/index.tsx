@@ -10,14 +10,22 @@ import styles from './index.module.scss';
 interface NegotiationCardProps {
   item: NegotiationItem;
   onClick?: (id: string) => void;
+  onUrge?: (id: string) => void;
+  showUrge?: boolean;
 }
 
-const NegotiationCard: React.FC<NegotiationCardProps> = ({ item, onClick }) => {
+const NegotiationCard: React.FC<NegotiationCardProps> = ({ item, onClick, onUrge, showUrge = false }) => {
   const urgency = getUrgencyLevel(item.remainingHours);
   const urgencyClassMap = {
     urgent: styles.urgent,
     warning: styles.warning,
     normal: styles.normal,
+  };
+  const isUrgent = urgency === 'urgent' || item.remainingHours <= 0;
+
+  const handleUrgeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onUrge?.(item.id);
   };
 
   return (
@@ -46,6 +54,15 @@ const NegotiationCard: React.FC<NegotiationCardProps> = ({ item, onClick }) => {
           </Text>
         </View>
       </View>
+      {showUrge && isUrgent && (
+        <View className={styles.actionRow}>
+          <Text className={styles.urgeHint}>⏰ 已超时/即将超时</Text>
+          <View className={styles.urgeBtn} onClick={handleUrgeClick}>
+            <Text>⚡</Text>
+            <Text>催办</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };

@@ -28,6 +28,7 @@ const TodoPage: React.FC = () => {
   const [showRolePicker, setShowRolePicker] = useState(false);
   const user = useNegotiationStore((s) => s.user);
   const switchRole = useNegotiationStore((s) => s.switchRole);
+  const urgeNegotiation = useNegotiationStore((s) => s.urgeNegotiation);
   const todoList = useNegotiationStore(selectTodoList);
   const recordList = useNegotiationStore(selectRecordList);
 
@@ -52,6 +53,11 @@ const TodoPage: React.FC = () => {
       title: `已切换为${ROLE_LABELS[role]}`,
       icon: 'none',
     });
+  };
+
+  const handleUrge = (id: string) => {
+    urgeNegotiation(id);
+    Taro.showToast({ title: '已发送催办', icon: 'success' });
   };
 
   return (
@@ -135,7 +141,13 @@ const TodoPage: React.FC = () => {
       <View className={styles.list}>
         {filteredList.length > 0 ? (
           filteredList.map((item) => (
-            <NegotiationCard key={item.id} item={item} onClick={handleCardClick} />
+            <NegotiationCard
+              key={item.id}
+              item={item}
+              onClick={handleCardClick}
+              showUrge
+              onUrge={handleUrge}
+            />
           ))
         ) : (
           <View className={styles.empty}>

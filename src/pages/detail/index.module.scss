@@ -217,3 +217,37 @@
   color: $color-text-white;
   font-weight: $font-weight-semibold;
 }
+
+.returnAlert {
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+  border-left: 8rpx solid #e53e3e;
+  border-radius: $radius-lg;
+  margin: $spacing-md $page-padding;
+  padding: $spacing-lg;
+}
+
+.returnAlertTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: #c53030;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.returnAlertRow {
+  font-size: $font-size-sm;
+  color: #742a2a;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-xs;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.returnAlertLabel {
+  font-weight: $font-weight-semibold;
+  color: #c53030;
+  margin-right: $spacing-xs;
+}
+

@@ -46,6 +46,14 @@
   background-color: #553c9a;
 }
 
+.dotUrge {
+  background-color: #e53e3e;
+}
+
+.dotResubmit {
+  background-color: #3182ce;
+}
+
 .line {
   width: 4rpx;
   flex: 1;
@@ -101,6 +109,14 @@
   color: #553c9a;
 }
 
+.actionUrge {
+  color: #e53e3e;
+}
+
+.actionResubmit {
+  color: #3182ce;
+}
+
 .role {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
@@ -146,3 +162,64 @@
   color: #744210;
   line-height: $line-height-normal;
 }
+
+.returnInfo {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: #fff5f5;
+  border-left: 6rpx solid #e53e3e;
+  border-radius: $radius-sm;
+}
+
+.returnLabel {
+  font-size: $font-size-xs;
+  color: #c53030;
+  font-weight: $font-weight-semibold;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.returnContent {
+  font-size: $font-size-sm;
+  color: #742a2a;
+  line-height: $line-height-normal;
+}
+
+.urgeInfo {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: #fffaf0;
+  border-left: 6rpx solid #dd6b20;
+  border-radius: $radius-sm;
+}
+
+.urgeLabel {
+  font-size: $font-size-xs;
+  color: #c05621;
+  font-weight: $font-weight-semibold;
+  display: block;
+}
+
+.supplementBlock {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: #ebf8ff;
+  border-left: 6rpx solid #3182ce;
+  border-radius: $radius-sm;
+}
+
+.supplementLabel {
+  font-size: $font-size-xs;
+  color: #2b6cb0;
+  font-weight: $font-weight-semibold;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.supplementItem {
+  font-size: $font-size-xs;
+  color: #2c5282;
+  line-height: $line-height-tight;
+  display: block;
+}
+

@@ -104,3 +104,38 @@
     color: $color-status-returned;
   }
 }
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.urgeBtn {
+  @include button-reset;
+  height: 56rpx;
+  padding: 0 $spacing-lg;
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  color: #ffffff;
+  font-weight: $font-weight-semibold;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.96);
+  }
+}
+
+.urgeHint {
+  font-size: $font-size-xs;
+  color: $color-status-returned;
+  font-weight: $font-weight-medium;
+}
+

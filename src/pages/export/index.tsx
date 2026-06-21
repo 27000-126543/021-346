@@ -7,12 +7,20 @@ import {
   ROLE_LABELS,
   SIGN_ACTION_LABELS,
   FLOW_ORDER,
+  TIMELINE_ACTION_LABELS,
 } from '@/types/negotiation';
 import type { UserRole, TimelineNode, SignAction } from '@/types/negotiation';
 import { formatFullTime } from '@/utils/timeUtils';
 import styles from './index.module.scss';
 
 const SIGN_ROLES: UserRole[] = FLOW_ORDER;
+
+const EXPORT_TYPE_LABEL: Record<string, string> = {
+  single: '单条导出',
+  batch: '批量导出',
+  share: '分享',
+  print: '发送打印',
+};
 
 const ExportPage: React.FC = () => {
   const [id, setId] = useState('');
@@ -309,6 +317,51 @@ const ExportPage: React.FC = () => {
                 <Text className={styles.cellEmpty}>无附件</Text>
               )}
             </View>
+
+            {item.supplementAttachments && item.supplementAttachments.length > 0 && (
+              <View className={styles.section}>
+                <Text className={styles.sectionTitle}>补充附件说明</Text>
+                <View className={styles.attachList}>
+                  {item.supplementAttachments.map((att, aIdx) => (
+                    <View key={att.id} className={styles.attachRow}>
+                      <Text className={styles.attachIcon}>📎</Text>
+                      <Text className={styles.attachName}>
+                        补充 {aIdx + 1}. {att.name}
+                      </Text>
+                      <Text className={styles.attachSize}>{att.size}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {(() => {
+              const processRecords = timeline.filter((t) =>
+                ['urged', 'returned', 'resubmitted', 'exported'].includes(t.action)
+              );
+              if (processRecords.length === 0) return null;
+              return (
+                <View className={styles.section}>
+                  <Text className={styles.sectionTitle}>过程管控记录</Text>
+                  <View className={styles.attachList}>
+                    {processRecords.map((node, pIdx) => (
+                      <View key={node.id} className={styles.attachRow}>
+                        <Text className={styles.attachIcon}>
+                          {node.action === 'urged' ? '⚡' : node.action === 'returned' ? '🔴' : node.action === 'resubmitted' ? '🔵' : '📤'}
+                        </Text>
+                        <Text className={styles.attachName}>
+                          {pIdx + 1}. {node.actorName}（{ROLE_LABELS[node.role]}）
+                          {TIMELINE_ACTION_LABELS[node.action] || node.action}
+                          {node.urgeTargetRole ? ` → ${ROLE_LABELS[node.urgeTargetRole]}` : ''}
+                          {node.exportType ? `(${EXPORT_TYPE_LABEL[node.exportType] || node.exportType})` : ''}
+                        </Text>
+                        <Text className={styles.attachSize}>{formatFullTime(node.timestamp)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              );
+            })()}
           </View>
         );
       })}

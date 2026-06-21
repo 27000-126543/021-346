@@ -26,6 +26,8 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
     returned: styles.actionReturn,
     forwarded: styles.actionForward,
     exported: styles.actionExport,
+    urged: styles.actionUrge,
+    resubmitted: styles.actionResubmit,
   };
 
   const dotColorMap: Record<string, string> = {
@@ -35,6 +37,8 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
     returned: styles.dotReturn,
     forwarded: styles.dotForward,
     exported: styles.dotExport,
+    urged: styles.dotUrge,
+    resubmitted: styles.dotResubmit,
   };
 
   const actionLabel = TIMELINE_ACTION_LABELS[node.action] || node.action;
@@ -56,12 +60,37 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
         </View>
         <Text className={styles.time}>{formatFullTime(node.timestamp)}</Text>
         {node.opinion ? <Text className={styles.opinion}>{node.opinion}</Text> : null}
+        {node.returnFromRole && node.returnReason && (
+          <View className={styles.returnInfo}>
+            <Text className={styles.returnLabel}>
+              退回来源：{ROLE_LABELS[node.returnFromRole]}
+            </Text>
+            <Text className={styles.returnContent}>退回原因：{node.returnReason}</Text>
+          </View>
+        )}
+        {node.urgeTargetRole && (
+          <View className={styles.urgeInfo}>
+            <Text className={styles.urgeLabel}>
+              催办对象：{ROLE_LABELS[node.urgeTargetRole]}
+            </Text>
+          </View>
+        )}
         {node.costRequirement ? (
           <View className={styles.costBlock}>
             <Text className={styles.costLabel}>费用控制要求</Text>
             <Text className={styles.costText}>{node.costRequirement}</Text>
           </View>
         ) : null}
+        {node.supplementAttachments && node.supplementAttachments.length > 0 && (
+          <View className={styles.supplementBlock}>
+            <Text className={styles.supplementLabel}>补充附件</Text>
+            {node.supplementAttachments.map((att) => (
+              <Text key={att.id} className={styles.supplementItem}>
+                📎 {att.name}
+              </Text>
+            ))}
+          </View>
+        )}
       </View>
     </View>
   );

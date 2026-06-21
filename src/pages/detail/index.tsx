@@ -3,7 +3,7 @@ import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useNegotiationStore } from '@/store/useNegotiationStore';
 import { ROLE_LABELS } from '@/types/negotiation';
-import type { SignAction } from '@/types/negotiation';
+import type { SignAction, AttachmentItem } from '@/types/negotiation';
 import StatusTag from '@/components/StatusTag';
 import TimelineItem from '@/components/TimelineItem';
 import SignPanel from '@/components/SignPanel';
@@ -16,6 +16,7 @@ const DetailPage: React.FC = () => {
   const negotiations = useNegotiationStore((s) => s.negotiations);
   const timelines = useNegotiationStore((s) => s.timelines);
   const signNegotiation = useNegotiationStore((s) => s.signNegotiation);
+  const resubmitNegotiation = useNegotiationStore((s) => s.resubmitNegotiation);
   const addViewRecord = useNegotiationStore((s) => s.addViewRecord);
   const addExportRecord = useNegotiationStore((s) => s.addExportRecord);
 
@@ -43,20 +44,38 @@ const DetailPage: React.FC = () => {
     return timelines[id] || [];
   }, [id, timelines]);
 
+  const lastReturnNode = useMemo(() => {
+    const returns = timeline.filter((t) => t.action === 'returned');
+    if (returns.length === 0) return null;
+    return returns[returns.length - 1];
+  }, [timeline]);
+
   const canSign = useMemo(() => {
     if (!item) return false;
     return item.currentNodeRole === user.role && (item.status === 'waiting' || item.status === 'processing');
   }, [item, user.role]);
 
-  const handleSign = (action: SignAction, opinion: string, costRequirement?: string) => {
+  const canResubmit = useMemo(() => {
+    if (!item) return false;
+    return item.currentNodeRole === user.role && item.status === 'returned';
+  }, [item, user.role]);
+
+  const handleSign = (
+    action: SignAction | 'resubmit',
+    opinion: string,
+    costRequirement?: string,
+    supplementAttachments?: AttachmentItem[]
+  ) => {
     if (!id) return;
-    signNegotiation(id, action, opinion, costRequirement);
-    Taro.showToast({
-      title: '签署成功',
-      icon: 'success',
-      duration: 1500,
-    });
-    console.info('[Detail] sign negotiation', { id, action, opinion, costRequirement });
+    if (action === 'resubmit') {
+      resubmitNegotiation(id, opinion, supplementAttachments);
+      Taro.showToast({ title: '已重新提交', icon: 'success', duration: 1500 });
+      console.info('[Detail] resubmit negotiation', { id, opinion, supplementAttachments });
+    } else {
+      signNegotiation(id, action, opinion, costRequirement, supplementAttachments);
+      Taro.showToast({ title: '签署成功', icon: 'success', duration: 1500 });
+      console.info('[Detail] sign negotiation', { id, action, opinion, costRequirement, supplementAttachments });
+    }
   };
 
   const handleExportSingle = () => {
@@ -73,11 +92,11 @@ const DetailPage: React.FC = () => {
 
   if (!item) {
     return (
-      <View className={styles.container}>
+      <ScrollView className={styles.container} scrollY>
         <View className={styles.section}>
           <Text style={{ fontSize: '28rpx', color: '#a0aec0' }}>加载中...</Text>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -85,6 +104,20 @@ const DetailPage: React.FC = () => {
 
   return (
     <ScrollView className={styles.container} scrollY>
+      {lastReturnNode && canResubmit && (
+        <View className={styles.returnAlert}>
+          <Text className={styles.returnAlertTitle}>⚠️ 该洽商已被退回，请补正后重新提交</Text>
+          <View className={styles.returnAlertRow}>
+            <Text className={styles.returnAlertLabel}>退回来源：</Text>
+            <Text>{lastReturnNode.returnFromRole ? ROLE_LABELS[lastReturnNode.returnFromRole] : ROLE_LABELS[lastReturnNode.role]}</Text>
+          </View>
+          <View className={styles.returnAlertRow}>
+            <Text className={styles.returnAlertLabel}>退回原因：</Text>
+            <Text>{lastReturnNode.returnReason || lastReturnNode.opinion}</Text>
+          </View>
+        </View>
+      )}
+
       <View className={styles.section}>
         <View className={styles.titleRow}>
           <Text className={styles.detailTitle}>{item.title}</Text>
@@ -148,6 +181,21 @@ const DetailPage: React.FC = () => {
         </View>
       )}
 
+      {item.supplementAttachments && item.supplementAttachments.length > 0 && (
+        <View className={styles.section}>
+          <Text className={styles.contentLabel}>补充附件说明</Text>
+          {item.supplementAttachments.map((att) => (
+            <View key={att.id} className={styles.attachmentItem}>
+              <View className={styles.attachInfo}>
+                <Text className={styles.attachIcon}>📎</Text>
+                <Text className={styles.attachName}>{att.name}</Text>
+              </View>
+              <Text className={styles.attachMeta}>{att.size}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
       <View className={styles.timelineSection}>
         <View className={styles.sectionHeader}>
           <Text className={styles.sectionTitle}>节点轨迹</Text>
@@ -167,7 +215,13 @@ const DetailPage: React.FC = () => {
 
       {canSign && (
         <View className={styles.signSection}>
-          <SignPanel role={user.role} onSubmit={handleSign} />
+          <SignPanel role={user.role} mode="sign" onSubmit={handleSign} />
+        </View>
+      )}
+
+      {canResubmit && (
+        <View className={styles.signSection}>
+          <SignPanel role={user.role} mode="resubmit" onSubmit={handleSign} />
         </View>
       )}
 

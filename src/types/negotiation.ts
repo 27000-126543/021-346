@@ -10,7 +10,9 @@ export type TimelineAction =
   | 'agreed'
   | 'submitted'
   | 'forwarded'
-  | 'exported';
+  | 'exported'
+  | 'urged'
+  | 'resubmitted';
 
 export const FLOW_ORDER: UserRole[] = [
   'subcontractor',
@@ -39,6 +41,7 @@ export interface NegotiationItem {
   proposedMethod: string;
   photos: string[];
   attachments: AttachmentItem[];
+  supplementAttachments?: AttachmentItem[];
   createdAt: string;
   updatedAt: string;
 }
@@ -61,6 +64,10 @@ export interface TimelineNode {
   signAction?: SignAction;
   costRequirement?: string;
   exportType?: 'single' | 'batch' | 'share' | 'print';
+  returnFromRole?: UserRole;
+  returnReason?: string;
+  urgeTargetRole?: UserRole;
+  supplementAttachments?: AttachmentItem[];
 }
 
 export interface SignOpinion {
@@ -108,4 +115,35 @@ export const TIMELINE_ACTION_LABELS: Record<string, string> = {
   submitted: '提交',
   forwarded: '转交',
   exported: '导出会签包',
+  urged: '催办',
+  resubmitted: '重新提交',
+};
+
+export const COMMON_OPINIONS: Record<UserRole, string[]> = {
+  owner: [
+    '同意变更，按预算内费用执行',
+    '原则同意，费用需严格控制',
+    '请补充详细费用测算后再报',
+    '需走招投标流程确定单价',
+  ],
+  supervisor: [
+    '情况属实，同意变更',
+    '同意按此方案施工，请总包做好质量管控',
+    '建议请设计单位出具正式变更图',
+    '需补充现场实测数据',
+    '附件不完整，请补充相关资料',
+  ],
+  general_contractor: [
+    '同意按此方案执行',
+    '已核实现场情况，情况属实',
+    '请明确费用承担方后再施工',
+    '需补充技术交底记录',
+    '工期影响需另行评估',
+  ],
+  subcontractor: [
+    '现场情况已核实，申请变更',
+    '按甲方要求调整做法，特此申请',
+    '原做法无法实施，申请变更',
+    '已补充相关证明材料，请审核',
+  ],
 };
