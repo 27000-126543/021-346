@@ -157,11 +157,39 @@ const ExportPage: React.FC = () => {
             <View className={styles.docHeader}>
               <Text className={styles.docTitle}>
                 {idx + 1}. {item.title}
+                <Text style={{ fontSize: '24rpx', color: '#553c9a', marginLeft: '16rpx', fontWeight: 600 }}>
+                  V{item.version}
+                </Text>
               </Text>
               <Text className={styles.docNo}>
                 编号：{item.id.toUpperCase()} · 提交时间 {item.createdAt}
               </Text>
             </View>
+
+            {(() => {
+              const versionNodes = timeline
+                .filter((t) => t.version && t.versionDiff && t.versionDiff.length > 0)
+                .reverse();
+              if (versionNodes.length === 0) return null;
+              return (
+                <View className={styles.section}>
+                  <Text className={styles.sectionTitle}>版本留痕</Text>
+                  {versionNodes.map((vn) => (
+                    <View key={vn.id} className={styles.versionBar}>
+                      <Text className={styles.versionTitle}>
+                        第 {vn.version} 版
+                      </Text>
+                      {vn.versionDiff?.map((d) => (
+                        <Text key={d} className={styles.versionDiffRow}>• {d}</Text>
+                      ))}
+                      <Text className={styles.versionAuthor}>
+                        {vn.actorName}（{ROLE_LABELS[vn.role]}）于 {formatFullTime(vn.timestamp)} 更新
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            })()}
 
             <View className={styles.section}>
               <Text className={styles.sectionTitle}>节点流转顺序</Text>

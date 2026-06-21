@@ -382,3 +382,33 @@
   margin: 0 $spacing-xs;
 }
 
+.versionBar {
+  background-color: #faf5ff;
+  border-left: 6rpx solid #553c9a;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin: $spacing-md 0;
+}
+
+.versionTitle {
+  font-size: $font-size-sm;
+  color: #553c9a;
+  font-weight: $font-weight-bold;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.versionDiffRow {
+  font-size: $font-size-xs;
+  color: #44337a;
+  line-height: $line-height-normal;
+  margin-bottom: 4rpx;
+}
+
+.versionAuthor {
+  font-size: $font-size-xs;
+  color: #805ad5;
+  margin-top: $spacing-xs;
+  display: block;
+}
+

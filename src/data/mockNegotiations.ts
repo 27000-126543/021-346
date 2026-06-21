@@ -32,6 +32,7 @@ export const mockNegotiations: NegotiationItem[] = [
     ],
     createdAt: '2026-06-18 09:30:00',
     updatedAt: '2026-06-19 14:20:00',
+    version: 1,
   },
   {
     id: 'n002',

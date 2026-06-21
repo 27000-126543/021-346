@@ -42,6 +42,7 @@ export interface NegotiationItem {
   photos: string[];
   attachments: AttachmentItem[];
   supplementAttachments?: AttachmentItem[];
+  version: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,7 +68,11 @@ export interface TimelineNode {
   returnFromRole?: UserRole;
   returnReason?: string;
   urgeTargetRole?: UserRole;
+  urgeRemark?: string;
+  urgeCount?: number;
   supplementAttachments?: AttachmentItem[];
+  version?: number;
+  versionDiff?: string[];
 }
 
 export interface SignOpinion {
@@ -147,3 +152,18 @@ export const COMMON_OPINIONS: Record<UserRole, string[]> = {
     '已补充相关证明材料，请审核',
   ],
 };
+
+export type ControlDimension =
+  | 'all'
+  | 'pending_timeout'
+  | 'urged'
+  | 'returned'
+  | 'resubmitting';
+
+export const CONTROL_DIMENSIONS: { label: string; value: ControlDimension }[] = [
+  { label: '全部', value: 'all' },
+  { label: '即将超时', value: 'pending_timeout' },
+  { label: '已催办', value: 'urged' },
+  { label: '已退回', value: 'returned' },
+  { label: '补正中', value: 'resubmitting' },
+];

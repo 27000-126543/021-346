@@ -73,6 +73,14 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
             <Text className={styles.urgeLabel}>
               催办对象：{ROLE_LABELS[node.urgeTargetRole]}
             </Text>
+            {node.urgeRemark && (
+              <Text className={styles.urgeRemarkRow}>催办说明：{node.urgeRemark}</Text>
+            )}
+            {node.urgeCount && node.urgeCount > 0 && (
+              <Text className={styles.urgeCountRow}>
+                累计催办第 {node.urgeCount} 次
+              </Text>
+            )}
           </View>
         )}
         {node.costRequirement ? (
@@ -89,6 +97,18 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ node, isLast }) => {
                 📎 {att.name}
               </Text>
             ))}
+          </View>
+        )}
+        {node.version && node.versionDiff && node.versionDiff.length > 0 && (
+          <View className={styles.versionBlock}>
+            <Text className={styles.versionLabel}>
+              第 {node.version} 版 · 本次变更
+            </Text>
+            <View className={styles.versionDiffList}>
+              {node.versionDiff.map((d) => (
+                <Text key={d} className={styles.versionDiffTag}>{d}</Text>
+              ))}
+            </View>
           </View>
         )}
       </View>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import dayjs from 'dayjs';
+import Taro from '@tarojs/taro';
 import type { NegotiationItem, TimelineNode, User, UserRole, AttachmentItem } from '@/types/negotiation';
 import { FLOW_ORDER, NODE_NAME_MAP } from '@/types/negotiation';
 import { mockNegotiations, mockTimelines, mockUser } from '@/data/mockNegotiations';
@@ -36,9 +37,9 @@ const PREV_ROLE = (currentRole: UserRole): UserRole | null => {
 
 const loadFromStorage = <T>(key: string, fallback: T): T => {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = Taro.getStorageSync(key);
     if (!raw) return fallback;
-    return JSON.parse(raw);
+    return typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch {
     return fallback;
   }
@@ -46,10 +47,22 @@ const loadFromStorage = <T>(key: string, fallback: T): T => {
 
 const saveToStorage = <T>(key: string, value: T) => {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    Taro.setStorageSync(key, JSON.stringify(value));
   } catch {
     // ignore
   }
+};
+
+const buildVersionDiff = (
+  oldNeg: NegotiationItem | undefined,
+  changes: { costChanged?: boolean; supplementChanged?: boolean; statusChanged?: boolean; nodeChanged?: boolean }
+): string[] => {
+  const diff: string[] = [];
+  if (changes.nodeChanged) diff.push('节点流转');
+  if (changes.statusChanged) diff.push('状态变更');
+  if (changes.costChanged) diff.push('费用控制要求更新');
+  if (changes.supplementChanged) diff.push('补充附件');
+  return diff;
 };
 
 export interface NegotiationState {
@@ -71,7 +84,7 @@ export interface NegotiationState {
     opinion: string,
     supplementAttachments?: AttachmentItem[]
   ) => void;
-  urgeNegotiation: (id: string) => void;
+  urgeNegotiation: (id: string, targetRole?: UserRole, remark?: string) => void;
   addViewRecord: (id: string) => void;
   addExportRecord: (ids: string[], exportType: 'single' | 'batch' | 'share' | 'print') => void;
 }
@@ -87,13 +100,21 @@ const selectTodoList = (s: NegotiationState) =>
     return false;
   });
 const selectRecordList = (s: NegotiationState) =>
-  s.negotiations.filter((n) => n.status === 'completed');
+  s.negotiations.filter((n) => n.status === 'completed' || n.status === 'returned');
 
 export { selectUser, selectNegotiations, selectTimelines, selectTodoList, selectRecordList };
 
+const initNegotiations = (): NegotiationItem[] => {
+  const raw = loadFromStorage<NegotiationItem[]>(STORAGE_KEY_NEGOTIATIONS, []);
+  if (Array.isArray(raw) && raw.length > 0) {
+    return raw.map((n) => ({ ...n, version: n.version || 1 }));
+  }
+  return mockNegotiations.map((n) => ({ ...n, version: 1 }));
+};
+
 export const useNegotiationStore = create<NegotiationState>((set, get) => ({
   user: loadFromStorage(STORAGE_KEY_USER, mockUser),
-  negotiations: loadFromStorage(STORAGE_KEY_NEGOTIATIONS, mockNegotiations),
+  negotiations: initNegotiations(),
   timelines: loadFromStorage(STORAGE_KEY_TIMELINES, mockTimelines),
 
   switchRole: (role: UserRole) => {
@@ -121,6 +142,11 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
   signNegotiation: (id, action, opinion, costRequirement, supplementAttachments) => {
     set((state) => {
       const signerRole = state.user.role;
+      const oldNeg = state.negotiations.find((n) => n.id === id);
+      const prevCostReq = state.timelines[id]
+        ? [...state.timelines[id]].reverse().find((t) => t.costRequirement)?.costRequirement
+        : undefined;
+
       const updatedNegotiations = state.negotiations.map((n) => {
         if (n.id !== id) return n;
 
@@ -155,10 +181,18 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
           currentNode: newNodeName,
           updatedAt: new Date().toISOString(),
           supplementAttachments: updatedSupp,
+          version: n.version + 1,
         };
       });
 
       const targetNeg = updatedNegotiations.find((n) => n.id === id);
+      const diff = buildVersionDiff(oldNeg, {
+        costChanged: !!costRequirement && costRequirement !== prevCostReq,
+        supplementChanged: !!(supplementAttachments && supplementAttachments.length > 0),
+        statusChanged: oldNeg?.status !== targetNeg?.status,
+        nodeChanged: oldNeg?.currentNodeRole !== targetNeg?.currentNodeRole,
+      });
+
       const newTimelineNode: TimelineNode = {
         id: `t_${Date.now()}`,
         negotiationId: id,
@@ -171,6 +205,8 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
         ...(costRequirement ? { costRequirement } : {}),
         ...(action !== 'agree' ? { returnFromRole: signerRole, returnReason: opinion } : {}),
         ...(supplementAttachments && supplementAttachments.length > 0 ? { supplementAttachments } : {}),
+        version: targetNeg?.version,
+        versionDiff: diff.length > 0 ? diff : undefined,
       };
 
       const existingTimelines = state.timelines[id] || [];
@@ -189,6 +225,8 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
         costRequirement,
         nextStatus: targetNeg?.status,
         nextNode: targetNeg?.currentNode,
+        version: targetNeg?.version,
+        diff,
       });
 
       return {
@@ -216,10 +254,17 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
           currentNode: NODE_NAME_MAP[nextRole],
           updatedAt: new Date().toISOString(),
           supplementAttachments: updatedSupp,
+          version: n.version + 1,
         };
       });
 
       const targetNeg = updatedNegotiations.find((n) => n.id === id);
+      const diff = buildVersionDiff(current, {
+        supplementChanged: !!(supplementAttachments && supplementAttachments.length > 0),
+        statusChanged: true,
+        nodeChanged: true,
+      });
+
       const newTimelineNode: TimelineNode = {
         id: `t_${Date.now()}`,
         negotiationId: id,
@@ -229,6 +274,8 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
         opinion,
         timestamp: new Date().toISOString(),
         ...(supplementAttachments && supplementAttachments.length > 0 ? { supplementAttachments } : {}),
+        version: targetNeg?.version,
+        versionDiff: diff.length > 0 ? diff : undefined,
       };
 
       const existingTimelines = state.timelines[id] || [];
@@ -244,6 +291,8 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
         id,
         opinion,
         nextNode: targetNeg?.currentNode,
+        version: targetNeg?.version,
+        diff,
       });
 
       return {
@@ -253,10 +302,16 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
     });
   },
 
-  urgeNegotiation: (id: string) => {
+  urgeNegotiation: (id: string, targetRole?: UserRole, remark?: string) => {
     set((state) => {
       const current = state.negotiations.find((n) => n.id === id);
       if (!current) return {};
+
+      const urgeTo = targetRole || current.currentNodeRole;
+      const existingTimelines = state.timelines[id] || [];
+      const urgeCountForTarget = existingTimelines.filter(
+        (t) => t.action === 'urged' && t.urgeTargetRole === urgeTo
+      ).length + 1;
 
       const newTimelineNode: TimelineNode = {
         id: `t_${Date.now()}`,
@@ -264,12 +319,13 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
         role: state.user.role,
         actorName: state.user.name,
         action: 'urged',
-        opinion: '请尽快处理该洽商',
+        opinion: remark || '请尽快处理该洽商',
         timestamp: new Date().toISOString(),
-        urgeTargetRole: current.currentNodeRole,
+        urgeTargetRole: urgeTo,
+        urgeRemark: remark,
+        urgeCount: urgeCountForTarget,
       };
 
-      const existingTimelines = state.timelines[id] || [];
       const updatedTimelines = {
         ...state.timelines,
         [id]: [...existingTimelines, newTimelineNode],
@@ -280,7 +336,9 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
       console.info('[UrgeNegotiation]', {
         id,
         from: state.user.role,
-        to: current.currentNodeRole,
+        to: urgeTo,
+        remark,
+        urgeCountForTarget,
       });
 
       return { timelines: updatedTimelines };
@@ -326,6 +384,7 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
       const now = new Date().toISOString();
       ids.forEach((id, idx) => {
         const list = newTimelines[id] || [];
+        const current = state.negotiations.find((n) => n.id === id);
         const newNode: TimelineNode = {
           id: `t_${Date.now()}_${idx}`,
           negotiationId: id,
@@ -335,6 +394,7 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
           opinion: '',
           timestamp: now,
           exportType,
+          version: current?.version,
         };
         newTimelines[id] = [...list, newNode];
       });

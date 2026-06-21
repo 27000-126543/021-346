@@ -2,12 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useNegotiationStore } from '@/store/useNegotiationStore';
-import { ROLE_LABELS } from '@/types/negotiation';
-import type { SignAction, AttachmentItem } from '@/types/negotiation';
+import { ROLE_LABELS, FLOW_ORDER, TIMELINE_ACTION_LABELS } from '@/types/negotiation';
+import type { SignAction, AttachmentItem, TimelineNode, UserRole } from '@/types/negotiation';
 import StatusTag from '@/components/StatusTag';
 import TimelineItem from '@/components/TimelineItem';
 import SignPanel from '@/components/SignPanel';
-import { formatRemainingTime, getUrgencyLevel } from '@/utils/timeUtils';
+import { formatRemainingTime, getUrgencyLevel, formatFullTime } from '@/utils/timeUtils';
 import styles from './index.module.scss';
 
 const DetailPage: React.FC = () => {
@@ -48,6 +48,30 @@ const DetailPage: React.FC = () => {
     const returns = timeline.filter((t) => t.action === 'returned');
     if (returns.length === 0) return null;
     return returns[returns.length - 1];
+  }, [timeline]);
+
+  const lastSignNode = useMemo(() => {
+    const signs = timeline.filter((t) => ['agreed', 'returned', 'resubmitted'].includes(t.action));
+    if (signs.length === 0) return null;
+    return signs[signs.length - 1];
+  }, [timeline]);
+
+  const nextStep = useMemo(() => {
+    if (!item) return '';
+    if (item.status === 'completed') return '流程已完成';
+    if (item.status === 'returned') {
+      return `请 ${ROLE_LABELS[item.currentNodeRole]} 补正后重新提交`;
+    }
+    const idx = FLOW_ORDER.indexOf(item.currentNodeRole);
+    if (idx >= 0 && idx < FLOW_ORDER.length - 1) {
+      const nextRole = FLOW_ORDER[idx + 1];
+      return `${ROLE_LABELS[item.currentNodeRole]} 同意后，将流转至 ${ROLE_LABELS[nextRole]}`;
+    }
+    return `请 ${ROLE_LABELS[item.currentNodeRole]} 进行最终审核`;
+  }, [item]);
+
+  const urgeCountTotal = useMemo(() => {
+    return timeline.filter((t) => t.action === 'urged').length;
   }, [timeline]);
 
   const canSign = useMemo(() => {
@@ -120,7 +144,12 @@ const DetailPage: React.FC = () => {
 
       <View className={styles.section}>
         <View className={styles.titleRow}>
-          <Text className={styles.detailTitle}>{item.title}</Text>
+          <Text className={styles.detailTitle}>
+            {item.title}
+            <View className={styles.versionBadge}>
+              <Text className={styles.versionText}>V{item.version}</Text>
+            </View>
+          </Text>
           <StatusTag status={item.status} />
         </View>
         <View className={styles.metaRow}>
@@ -139,6 +168,35 @@ const DetailPage: React.FC = () => {
             </View>
           )}
           <Text className={styles.metaText}>更新于 {item.updatedAt}</Text>
+        </View>
+      </View>
+
+      <View className={styles.processCard}>
+        <Text className={styles.processCardTitle}>📊 过程管控摘要</Text>
+        <View className={styles.processRow}>
+          <Text className={styles.processLabel}>当前卡在</Text>
+          <Text className={styles.processValue}>
+            {item.currentNode} · {ROLE_LABELS[item.currentNodeRole]}
+          </Text>
+        </View>
+        <View className={styles.processRow}>
+          <Text className={styles.processLabel}>最近一次处理</Text>
+          <Text className={styles.processValue}>
+            {lastSignNode
+              ? `${lastSignNode.actorName}（${ROLE_LABELS[lastSignNode.role]}）${TIMELINE_ACTION_LABELS[lastSignNode.action]}：${lastSignNode.opinion || '无意见'}（${formatFullTime(lastSignNode.timestamp)}）`
+              : '暂无处理记录'}
+          </Text>
+        </View>
+        {urgeCountTotal > 0 && (
+          <View className={styles.processRow}>
+            <Text className={styles.processLabel}>催办次数</Text>
+            <Text className={styles.processValue} style={{ color: '#c53030' }}>
+              累计 {urgeCountTotal} 次
+            </Text>
+          </View>
+        )}
+        <View className={styles.processSuggest}>
+          <Text className={styles.processSuggestText}>💡 下一步建议：{nextStep}</Text>
         </View>
       </View>
 

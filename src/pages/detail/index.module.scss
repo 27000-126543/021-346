@@ -251,3 +251,75 @@
   margin-right: $spacing-xs;
 }
 
+.versionBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 48rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, #553c9a 0%, #805ad5 100%);
+  margin-left: $spacing-sm;
+  vertical-align: middle;
+
+  .versionText {
+    font-size: $font-size-xs;
+    color: #ffffff;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.processCard {
+  background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin: $spacing-md $page-padding;
+  box-shadow: $shadow-card;
+}
+
+.processCardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: #2b6cb0;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.processRow {
+  display: flex;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.processLabel {
+  font-size: $font-size-sm;
+  color: #2c5282;
+  font-weight: $font-weight-semibold;
+  width: 160rpx;
+  flex-shrink: 0;
+}
+
+.processValue {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: #1a365d;
+  line-height: $line-height-normal;
+}
+
+.processSuggest {
+  background-color: #fffaf0;
+  border-left: 6rpx solid #dd6b20;
+  padding: $spacing-sm $spacing-md;
+  margin-top: $spacing-md;
+  border-radius: $radius-sm;
+}
+
+.processSuggestText {
+  font-size: $font-size-sm;
+  color: #9c4221;
+  line-height: $line-height-normal;
+}
+
+

@@ -17,6 +17,15 @@ const RecordsPage: React.FC = () => {
   const recordList = useNegotiationStore(selectRecordList);
   const addExportRecord = useNegotiationStore((s) => s.addExportRecord);
 
+  const completedCount = useMemo(
+    () => recordList.filter((n) => n.status === 'completed').length,
+    [recordList]
+  );
+  const returnedCount = useMemo(
+    () => recordList.filter((n) => n.status === 'returned').length,
+    [recordList]
+  );
+
   const filteredList = useMemo(() => {
     return recordList.filter((n) => n.status === activeTab);
   }, [recordList, activeTab]);
@@ -39,7 +48,7 @@ const RecordsPage: React.FC = () => {
       <View className={styles.header}>
         <Text className={styles.headerTitle}>会签记录</Text>
         <Text className={styles.headerDesc}>
-          共 {recordList.length} 条已处理记录
+          共 {recordList.length} 条（已完成 {completedCount} · 已退回 {returnedCount}）
         </Text>
       </View>
 
@@ -54,6 +63,8 @@ const RecordsPage: React.FC = () => {
               className={classnames(styles.tabText, activeTab === tab.value && styles.tabTextActive)}
             >
               {tab.label}
+              {tab.value === 'completed' ? ` (${completedCount})` : ''}
+              {tab.value === 'returned' ? ` (${returnedCount})` : ''}
             </Text>
           </View>
         ))}
@@ -67,14 +78,19 @@ const RecordsPage: React.FC = () => {
         ) : (
           <View className={styles.empty}>
             <Text className={styles.emptyIcon}>📂</Text>
-            <Text className={styles.emptyText}>暂无记录</Text>
+            <Text className={styles.emptyText}>
+              {activeTab === 'returned' ? '暂无已退回洽商' : '暂无已完成洽商'}
+            </Text>
           </View>
         )}
       </View>
 
       {filteredList.length > 0 && (
         <View className={styles.exportBtn} onClick={handleExport}>
-          <Text className={styles.exportText}>导出会签包</Text>
+          <Text className={styles.exportText}>
+            {activeTab === 'returned' ? '批量导出已退回（' : '批量导出已完成（'}
+            {filteredList.length}）
+          </Text>
         </View>
       )}
     </ScrollView>

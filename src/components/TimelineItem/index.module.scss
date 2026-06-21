@@ -223,3 +223,51 @@
   display: block;
 }
 
+.urgeRemarkRow {
+  font-size: $font-size-sm;
+  color: #c05621;
+  line-height: $line-height-normal;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.urgeCountRow {
+  font-size: $font-size-xs;
+  color: #e53e3e;
+  font-weight: $font-weight-semibold;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.versionBlock {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: #faf5ff;
+  border-left: 6rpx solid #553c9a;
+  border-radius: $radius-sm;
+}
+
+.versionLabel {
+  font-size: $font-size-xs;
+  color: #553c9a;
+  font-weight: $font-weight-semibold;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.versionDiffList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.versionDiffTag {
+  font-size: $font-size-xs;
+  color: #553c9a;
+  background-color: #e9d8fd;
+  padding: 2rpx $spacing-sm;
+  border-radius: $radius-round;
+  font-weight: $font-weight-medium;
+}
+
+
